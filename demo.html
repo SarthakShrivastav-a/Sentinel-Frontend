@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .card {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4285F4;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+        .btn-google {
+            background-color: #DB4437;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+        #authStatus {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .logged-in {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .logged-out {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .profile-section {
+            display: none;
+            margin-top: 20px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #f0f0f0;
+            border-bottom: none;
+        }
+        .tab-content {
+            display: none;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 0 4px 4px 4px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Authentication Test</h1>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('login')">Login</div>
+        <div class="tab" onclick="showTab('register')">Register</div>
+        <div class="tab" onclick="showTab('profile')">Complete Profile</div>
+    </div>
+    
+    <div id="login" class="tab-content active">
+        <h2>Login</h2>
+        <div class="container">
+            <div class="card">
+                <h3>JWT Login</h3>
+                <form id="loginForm">
+                    <div>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div>
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>OAuth2 Login</h3>
+                <a href="http://localhost:8080/oauth2/authorization/google" class="btn btn-google">Login with Google</a>
+            </div>
+        </div>
+    </div>
+    
+    <div id="register" class="tab-content">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <div>
+                <label for="registerEmail">Email:</label>
+                <input type="email" id="registerEmail" required>
+            </div>
+            <div>
+                <label for="registerPassword">Password:</label>
+                <input type="password" id="registerPassword" required>
+            </div>
+            <div>
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" required>
+            </div>
+            <div>
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" required>
+            </div>
+            <div>
+                <label for="companyName">Company Name:</label>
+                <input type="text" id="companyName" required>
+            </div>
+            <button type="submit" class="btn">Register</button>
+        </form>
+    </div>
+    
+    <div id="profile" class="tab-content">
+        <h2>Complete Profile</h2>
+        <form id="profileForm">
+            <div>
+                <label for="profileFirstName">First Name:</label>
+                <input type="text" id="profileFirstName" required>
+            </div>
+            <div>
+                <label for="profileLastName">Last Name:</label>
+                <input type="text" id="profileLastName" required>
+            </div>
+            <div>
+                <label for="profileCompanyName">Company Name:</label>
+                <input type="text" id="profileCompanyName" required>
+            </div>
+            <button type="submit" class="btn">Update Profile</button>
+        </form>
+    </div>
+    
+    <div id="authStatus" class="logged-out">
+        You are not logged in.
+    </div>
+    
+    <div class="profile-section" id="userProfileSection">
+        <h2>User Profile</h2>
+        <div id="userProfile"></div>
+        <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+
+    <script>
+        // Check for OAuth2 callback
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const newUser = urlParams.get('newUser');
+            
+            if (token) {
+                localStorage.setItem('jwtToken', token);
+                updateAuthStatus(true);
+                
+                // If new user, show profile completion form
+                if (newUser === 'true') {
+                    showTab('profile');
+                }
+                
+                // Remove token from URL
+                window.history.replaceState({}, document.title, '/');
+            } else if (localStorage.getItem('jwtToken')) {
+                updateAuthStatus(true);
+            }
+        };
+        
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Activate tab button
+            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+        
+        // JWT Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const loginData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            
+            fetch('http://localhost:8080/api/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Login failed');
+                }
+                return response.text();
+            })
+            .then(token => {
+                localStorage.setItem('jwtToken', token);
+                updateAuthStatus(true);
+                document.getElementById('loginForm').reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Login failed: ' + error.message);
+            });
+        });
+        
+        // Registration
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const registerData = {
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                companyName: document.getElementById('companyName').value
+            };
+            
+            fetch('http://localhost:8080/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registerData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Registration failed');
+                }
+                return response.text();
+            })
+            .then(message => {
+                alert(message);
+                document.getElementById('registerForm').reset();
+                showTab('login');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Registration failed: ' + error.message);
+            });
+        });
+        
+        // Complete Profile
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const profileData = {
+                firstName: document.getElementById('profileFirstName').value,
+                lastName: document.getElementById('profileLastName').value,
+                companyName: document.getElementById('profileCompanyName').value
+            };
+            
+            fetch('http://localhost:8080/api/auth/complete-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+                },
+                body: JSON.stringify(profileData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Profile update failed');
+                }
+                return response.text();
+            })
+            .then(message => {
+                alert(message);
+                document.getElementById('profileForm').reset();
+                showTab('login');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Profile update failed: ' + error.message);
+            });
+        });
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('jwtToken');
+            updateAuthStatus(false);
+        });
+        
+        function updateAuthStatus(isLoggedIn) {
+            const statusDiv = document.getElementById('authStatus');
+            const profileSection = document.getElementById('userProfileSection');
+            
+            if (isLoggedIn) {
+                statusDiv.className = 'logged-in';
+                statusDiv.textContent = 'You are logged in.';
+                profileSection.style.display = 'block';
+                
+                // You can add code here to fetch and display user profile
+                // using the stored JWT token
+            } else {
+                statusDiv.className = 'logged-out';
+                statusDiv.textContent = 'You are not logged in.';
+                profileSection.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
