@@ -57,3 +57,15 @@ export interface MonitorDetails {
   upChecks: number
 }
 
+export interface TeamMember {
+  firstName: string
+  lastName: string
+  email: string
+  active: boolean
+}
+
+export interface Team {
+  teamId: string
+  userId: string
+  teamMembers: TeamMember[]
+}
