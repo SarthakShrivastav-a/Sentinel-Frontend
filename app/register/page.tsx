@@ -13,6 +13,7 @@ import { Zap } from "lucide-react"
 import { useAuth } from "@/lib/auth-provider"
 import { motion } from "framer-motion"
 import { RegisterAnimation } from "@/components/register-animation"
+import { Button } from "@/components/ui/button"
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -168,4 +169,33 @@ export default function RegisterPage() {
                 <motion.div 
                   className="w-full"
                   initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}\
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.3 }}
+                >
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating account..." : "Create account"}
+                  </Button>
+                </motion.div>
+                <motion.div
+                  className="text-center text-sm"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.3 }}
+                >
+                  Already have an account?{" "}
+                  <Link href="/login" className="text-primary hover:underline">
+                    Log in
+                  </Link>
+                </motion.div>
+              </CardFooter>
+            </form>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  )
+}

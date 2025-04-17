@@ -18,7 +18,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
           type: "spring",
           stiffness: 260,
           damping: 20,
-          duration: 0.04,
+          duration: 0.01,
         }}
       >
         {children}
