@@ -6,17 +6,31 @@ import { Area, AreaChart, CartesianGrid, Line, LineChart, ResponsiveContainer, X
 import { formatDate } from "@/lib/utils"
 
 interface MonitorDetailChartsProps {
-  recentChecks: MonitorCheckHistory[]
+  recentChecks?: MonitorCheckHistory[] | null
 }
 
 export function MonitorDetailCharts({ recentChecks }: MonitorDetailChartsProps) {
-  // Reverse the array to show oldest to newest (left to right)
-  const chartData = [...recentChecks].reverse().map((check) => ({
-    name: formatDate(check.timestamp, "short"),
-    responseTime: check.responseTime,
-    statusCode: check.statusCode,
-    status: check.status === "UP" ? 1 : 0,
-  }))
+  // Safely handle the case when recentChecks is undefined, null, or empty
+  const checkHistory = recentChecks || []
+
+  // Create chart data only if we have valid check history
+  const chartData =
+    checkHistory.length > 0
+      ? [...checkHistory].reverse().map((check) => ({
+          name: formatDate(check.timestamp, "short"),
+          responseTime: check.responseTime,
+          statusCode: check.statusCode,
+          status: check.status === "UP" ? 1 : 0,
+        }))
+      : [
+          // Provide default data when no check history is available
+          {
+            name: "No data",
+            responseTime: 0,
+            statusCode: 0,
+            status: 0,
+          },
+        ]
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -32,7 +46,7 @@ export function MonitorDetailCharts({ recentChecks }: MonitorDetailChartsProps) 
                   tickLine={false}
                   axisLine={false}
                   tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => value.split(" ")[1]}
+                  tickFormatter={(value) => (value.includes(" ") ? value.split(" ")[1] : value)}
                 />
                 <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
                 <Line
@@ -69,7 +83,7 @@ export function MonitorDetailCharts({ recentChecks }: MonitorDetailChartsProps) 
                   tickLine={false}
                   axisLine={false}
                   tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => value.split(" ")[1]}
+                  tickFormatter={(value) => (value.includes(" ") ? value.split(" ")[1] : value)}
                 />
                 <YAxis
                   tickLine={false}

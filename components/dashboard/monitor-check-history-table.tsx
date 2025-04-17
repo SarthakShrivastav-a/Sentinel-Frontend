@@ -4,10 +4,12 @@ import { MonitorStatusBadge } from "./monitor-status-badge"
 import { formatDate } from "@/lib/utils"
 
 interface MonitorCheckHistoryTableProps {
-  checks: MonitorCheckHistory[]
+  checks?: MonitorCheckHistory[] | null
 }
 
-export function MonitorCheckHistoryTable({ checks }: MonitorCheckHistoryTableProps) {
+export function MonitorCheckHistoryTable({ checks = [] }: MonitorCheckHistoryTableProps) {
+  const checkHistory = checks || []
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -21,8 +23,8 @@ export function MonitorCheckHistoryTable({ checks }: MonitorCheckHistoryTablePro
           </TableRow>
         </TableHeader>
         <TableBody>
-          {checks.length > 0 ? (
-            checks.map((check) => (
+          {checkHistory.length > 0 ? (
+            checkHistory.map((check) => (
               <TableRow key={check.id}>
                 <TableCell>{formatDate(check.timestamp)}</TableCell>
                 <TableCell>

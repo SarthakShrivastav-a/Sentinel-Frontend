@@ -22,12 +22,12 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  
+
   // Unwrap the params object using React.use()
   const monitorId = use(params).id
 
   useEffect(() => {
-    const getMonitorDetails = async () => { 
+    const getMonitorDetails = async () => {
       try {
         // Use the unwrapped monitorId instead of params.id
         const data = await fetchMonitorDetails(monitorId)
@@ -100,17 +100,9 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
     )
   }
 
-  // Destructure with default values to prevent undefined errors
-  const { monitor = {}, recentChecks = [], sslInfo = {} } = monitorDetails
-
-  // Ensure monitor has the required properties
-  const safeMonitor = {
-    id: monitor.id || '',
-    url: monitor.url || 'Unknown URL',
-    errorCondition: monitor.errorCondition || { threshold: 0 }
-  }
-
-  const latestCheck = recentChecks && recentChecks.length > 0 ? recentChecks[0] : null
+  // Safely access checkHistory and get the latest check
+  const checkHistory = monitorDetails.checkHistory || []
+  const latestCheck = checkHistory.length > 0 ? checkHistory[0] : null
 
   return (
     <div className="flex flex-col gap-6">
@@ -121,17 +113,17 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
           <Button variant="outline" size="icon" onClick={() => router.push("/dashboard/monitors")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-3xl font-bold tracking-tight">{safeMonitor.url}</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{monitorDetails.url}</h2>
           {latestCheck && <MonitorStatusBadge status={latestCheck.status} />}
         </div>
         <div className="flex items-center gap-2">
           <MonitorEditErrorConditionDialog
-            monitorId={safeMonitor.id}
-            currentErrorCondition={safeMonitor.errorCondition}
+            monitorId={monitorDetails.monitorId}
+            currentErrorCondition={monitorDetails.errorCondition}
             onUpdate={(updatedMonitor) => {
               setMonitorDetails({
                 ...monitorDetails,
-                monitor: updatedMonitor,
+                ...updatedMonitor,
               })
             }}
           />
@@ -168,7 +160,9 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{latestCheck ? `${latestCheck.responseTime}ms` : "N/A"}</div>
-            <p className="text-xs text-muted-foreground">Threshold: {safeMonitor.errorCondition.threshold}ms</p>
+            <p className="text-xs text-muted-foreground">
+              Threshold: {monitorDetails?.errorCondition?.threshold || "N/A"}ms
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -191,8 +185,36 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{sslInfo?.domainInfo?.name || "N/A"}</div>
-            <p className="text-xs text-muted-foreground">IP: {sslInfo?.domainInfo?.ipAddress || "Unknown"}</p>
+            <div className="text-2xl font-bold">{monitorDetails.sslInfo?.domainInfo?.name || "N/A"}</div>
+            <p className="text-xs text-muted-foreground">
+              IP: {monitorDetails.sslInfo?.domainInfo?.ipAddress || "Unknown"}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Uptime</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{monitorDetails.uptimePercentage || 0}%</div>
+            <p className="text-xs text-muted-foreground">
+              Total Checks: {monitorDetails.totalChecks || 0}
+              <br />
+              Up Checks: {monitorDetails.upChecks || 0}
+              <br />
+              Down Checks: {monitorDetails.downChecks || 0}
+              <br />
+              Current Status: {monitorDetails.currentStatus || "Unknown"}
+              <br />
+              Cumulative Downtime: {monitorDetails.cumulativeDowntime || 0}
+              <br />
+              Cumulative Response: {monitorDetails.cumulativeResponse || 0}
+              <br />
+              Consecutive Downtime Count: {monitorDetails.consecutiveDowntimeCount || 0}
+              <br />
+              Average Response Time: {monitorDetails.averageResponseTime || 0}ms
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -210,18 +232,18 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
               <CardDescription>View the performance metrics for this monitor over time.</CardDescription>
             </CardHeader>
             <CardContent className="h-[400px]">
-              <MonitorDetailCharts recentChecks={recentChecks} />
+              <MonitorDetailCharts recentChecks={monitorDetails.checkHistory} />
             </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value="history" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Check History</CardTitle>
+              <CardTitle>Check History </CardTitle>
               <CardDescription>Recent check history for this monitor.</CardDescription>
             </CardHeader>
             <CardContent>
-              <MonitorCheckHistoryTable checks={recentChecks} />
+              <MonitorCheckHistoryTable checks={monitorDetails.checkHistory || []} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -232,24 +254,24 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
               <CardDescription>Details about the SSL certificate for this domain.</CardDescription>
             </CardHeader>
             <CardContent>
-              {sslInfo ? (
+              {monitorDetails.sslInfo ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <h3 className="text-sm font-medium">Domain</h3>
-                      <p>{sslInfo.domainInfo?.name || "N/A"}</p>
+                      <p>{monitorDetails.sslInfo?.domainInfo?.name || "N/A"}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium">IP Address</h3>
-                      <p>{sslInfo.domainInfo?.ipAddress || "N/A"}</p>
+                      <p>{monitorDetails.sslInfo?.domainInfo?.ipAddress || "Unknown"}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium">Valid From</h3>
-                      <p>{sslInfo.validFrom ? formatDate(sslInfo.validFrom) : "N/A"}</p>
+                      <p>{monitorDetails.sslInfo.validFrom ? formatDate(monitorDetails.sslInfo.validFrom) : "N/A"}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium">Valid To</h3>
-                      <p>{sslInfo.validTo ? formatDate(sslInfo.validTo) : "N/A"}</p>
+                      <p>{monitorDetails.sslInfo.validTo ? formatDate(monitorDetails.sslInfo.validTo) : "N/A"}</p>
                     </div>
                   </div>
                 </div>
@@ -263,3 +285,4 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
     </div>
   )
 }
+  

@@ -41,9 +41,19 @@ export interface MonitorDetails {
   userId: string
   url: string
   errorCondition: ErrorCondition
-  createdAt: string
-  // ... other fields
+  createdAt: Date
   checkHistory: MonitorCheckHistory[]
   sslInfo: SSLInfo
   domainInfo: DomainInfo
+  currentStatus: string
+  uptimePercentage: number
+  totalChecks: number
+  downChecks: number
+  cumulativeDowntime: number
+  consecutiveDowntimeCount: number
+  cumulativeResponse: number
+  averageResponseTime: number
+  lastChecked: Date
+  upChecks: number
 }
+

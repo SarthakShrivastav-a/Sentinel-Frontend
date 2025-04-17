@@ -17,14 +17,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { Edit } from "lucide-react"
-import type { ErrorCondition, Monitor } from "@/lib/types"
 import { updateMonitorErrorCondition } from "@/lib/api"
+
+interface ErrorCondition {
+  triggerOn: string
+  threshold: number
+}
 
 interface MonitorEditErrorConditionDialogProps {
   monitorId: string
-  currentErrorCondition: ErrorCondition
-  onUpdate: (updatedMonitor: Monitor) => void
+  currentErrorCondition?: ErrorCondition
+  onUpdate: (updatedMonitor: any) => void
 }
 
 export function MonitorEditErrorConditionDialog({
@@ -33,8 +36,8 @@ export function MonitorEditErrorConditionDialog({
   onUpdate,
 }: MonitorEditErrorConditionDialogProps) {
   const [open, setOpen] = useState(false)
-  const [triggerOn, setTriggerOn] = useState(currentErrorCondition.triggerOn)
-  const [threshold, setThreshold] = useState(currentErrorCondition.threshold)
+  const [triggerOn, setTriggerOn] = useState(currentErrorCondition?.triggerOn || "STATUS_CODE")
+  const [threshold, setThreshold] = useState<number>(currentErrorCondition?.threshold || 200)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -49,13 +52,14 @@ export function MonitorEditErrorConditionDialog({
       })
 
       toast({
-        title: "Error condition updated",
-        description: "The monitor error condition has been updated successfully.",
+        title: "Success",
+        description: "Monitor error condition updated successfully.",
       })
 
       onUpdate(updatedMonitor)
       setOpen(false)
     } catch (error) {
+      console.error("Failed to update error condition:", error)
       toast({
         title: "Error",
         description: "Failed to update error condition. Please try again.",
@@ -69,48 +73,39 @@ export function MonitorEditErrorConditionDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <Edit className="mr-2 h-4 w-4" />
-          Edit Error Condition
-        </Button>
+        <Button variant="outline">Edit Alert Conditions</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit Alert Conditions</DialogTitle>
+          <DialogDescription>Configure when you want to be alerted about this monitor.</DialogDescription>
+        </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Edit Error Condition</DialogTitle>
-            <DialogDescription>Update the error condition for this monitor.</DialogDescription>
-          </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="triggerOn">Trigger On</Label>
+            <div className="grid gap-2">
+              <Label htmlFor="triggerOn">Alert When</Label>
               <Select value={triggerOn} onValueChange={(value) => setTriggerOn(value)}>
                 <SelectTrigger id="triggerOn">
-                  <SelectValue placeholder="Select a trigger condition" />
+                  <SelectValue placeholder="Select condition" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="RESPONSE_TIME">Response Time</SelectItem>
-                  <SelectItem value="STATUS_CODE">Status Code</SelectItem>
-                  <SelectItem value="CONTENT">Content</SelectItem>
+                  <SelectItem value="STATUS_CODE">Status Code is not 2xx</SelectItem>
+                  <SelectItem value="RESPONSE_TIME">Response Time exceeds threshold</SelectItem>
+                  <SelectItem value="CONTENT_MATCH">Content doesn't match</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="threshold">Threshold</Label>
-              <Input
-                id="threshold"
-                type="number"
-                value={threshold}
-                onChange={(e) => setThreshold(Number.parseInt(e.target.value))}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                {triggerOn === "RESPONSE_TIME"
-                  ? "Alert when response time exceeds this value (in milliseconds)"
-                  : triggerOn === "STATUS_CODE"
-                    ? "Alert when status code is greater than or equal to this value"
-                    : "Alert when content does not contain expected string"}
-              </p>
-            </div>
+            {triggerOn === "RESPONSE_TIME" && (
+              <div className="grid gap-2">
+                <Label htmlFor="threshold">Response Time Threshold (ms)</Label>
+                <Input
+                  id="threshold"
+                  type="number"
+                  value={threshold}
+                  onChange={(e) => setThreshold(Number.parseInt(e.target.value, 10))}
+                />
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button type="submit" disabled={isLoading}>

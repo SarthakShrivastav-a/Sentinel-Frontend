@@ -39,24 +39,12 @@ export async function getUserDetails() {
 export async function fetchMonitors(): Promise<Monitor[]> {
   return apiRequest("/api/monitor/fetch")
 }
-
 export async function fetchMonitorDetails(id: string): Promise<MonitorDetails> {
-  const data = await apiRequest(`/api/monitor/${id}/details`);
-  console.log(data)
-  
-  // Transform the flat structure to match your interface
-  return {
-    monitor: {
-      id: data.monitorId,
-      userId: data.userId,
-      url: data.url,
-      errorCondition: data.errorCondition,
-      createdAt: data.createdAt,
-      updatedAt: data.createdAt // If you need this field
-    },
-    recentChecks: data.checkHistory || [],
-    sslInfo: data.sslInfo || null
-  };
+  const data = await apiRequest(`/api/monitor/${id}/details`)
+
+  // Return the data directly as it already matches the MonitorDetails interface
+  // No need for transformation since the backend DTO structure matches our interface
+  return data as MonitorDetails
 }
 
 export async function createMonitor(monitorData: any): Promise<Monitor> {
@@ -69,15 +57,23 @@ export async function createMonitor(monitorData: any): Promise<Monitor> {
   })
 }
 
-export async function updateMonitorErrorCondition(id: string, errorCondition: any): Promise<Monitor> {
-  return apiRequest(`/api/monitor/${id}/error-condition`, {
+
+// Add this function if it doesn't exist already
+export async function updateMonitorErrorCondition(
+  monitorId: string,
+  errorCondition: { triggerOn: string; threshold: number },
+): Promise<any> {
+  const response = await apiRequest(`/api/monitor/${monitorId}/error-condition`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(errorCondition),
   })
+
+  return response
 }
+
 
 export async function deleteMonitor(id: string): Promise<void> {
   return apiRequest(`/api/monitor/${id}`, {
