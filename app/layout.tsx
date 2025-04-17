@@ -27,7 +27,8 @@ export default function RootLayout({
       <body className={`${inter.className} bg-mesh`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <PageTransition>{children}</PageTransition>
+            {children}
+            {/* <PageTransition>{children}</PageTransition> */}
             <Toaster />
             <CursorGlow />
             <Analytics />
