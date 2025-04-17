@@ -4,10 +4,10 @@
   const API_BASE_URL = "http://localhost:8080"
 
   // Helper function to handle API requests
-  async function apiRequest(endpoint: string, options: RequestInit = {}) {
+  export async function apiRequest(endpoint: string, options: RequestInit = {}) {
     const token = localStorage.getItem("auth_token")
     const url = `${API_BASE_URL}${endpoint}`
-
+    console.log("API Request URL:", url)
     if (token) {
       options.headers = {
         ...options.headers,

@@ -27,7 +27,7 @@ export async function addTeamMember(memberData: Omit<TeamMember, "id">): Promise
 }
 
 export async function updateTeamMember(email: string, memberData: Omit<TeamMember, "id">): Promise<TeamMember> {
-  return apiRequest(`/api/teams/members/${email}`, {
+  return apiRequest(`/api/teams/members/${encodeURIComponent(email)}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -37,13 +37,16 @@ export async function updateTeamMember(email: string, memberData: Omit<TeamMembe
 }
 
 export async function deleteTeamMember(email: string): Promise<void> {
-  return apiRequest(`/api/teams/members/${email}`, {
+  return apiRequest(`/api/teams/members/${encodeURIComponent(email)}`, {
     method: "DELETE",
   })
 }
 
 export async function updateTeamMemberActiveStatus(email: string, active: boolean): Promise<TeamMember> {
-  return apiRequest(`/api/teams/members/${email}/active`, {
+  // Add some debugging
+  console.log(`Updating status for: ${email}, Encoded: ${encodeURIComponent(email)}`);
+  
+  return apiRequest(`/api/teams/members/${encodeURIComponent(email)}/active`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
