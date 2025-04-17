@@ -33,7 +33,7 @@ export function MonitorDetailCharts({ recentChecks }: MonitorDetailChartsProps) 
         ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-6 md:grid-cols-2">
       <div>
         <h3 className="mb-2 text-sm font-medium">Response Time (ms)</h3>
         <Chart className="h-[300px]">
@@ -48,7 +48,7 @@ export function MonitorDetailCharts({ recentChecks }: MonitorDetailChartsProps) 
                   tick={{ fontSize: 12 }}
                   tickFormatter={(value) => (value.includes(" ") ? value.split(" ")[1] : value)}
                 />
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} domain={["auto", "auto"]} />
                 <Line
                   type="monotone"
                   dataKey="responseTime"
@@ -72,7 +72,7 @@ export function MonitorDetailCharts({ recentChecks }: MonitorDetailChartsProps) 
         </Chart>
       </div>
       <div>
-        <h3 className="mb-2 text-sm font-medium">Status</h3>
+        <h3 className="mb-2 text-sm font-medium">Status History</h3>
         <Chart className="h-[300px]">
           <ChartContainer>
             <ResponsiveContainer width="100%" height="100%">
@@ -99,6 +99,37 @@ export function MonitorDetailCharts({ recentChecks }: MonitorDetailChartsProps) 
                       className="border-none bg-background p-2 shadow-md"
                       label="Status"
                       formatter={(value) => [value === 1 ? "UP" : "DOWN", "Status"]}
+                    />
+                  }
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </Chart>
+      </div>
+
+      <div className="md:col-span-2">
+        <h3 className="mb-2 text-sm font-medium">Status Code Distribution</h3>
+        <Chart className="h-[200px]">
+          <ChartContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) => (value.includes(" ") ? value.split(" ")[1] : value)}
+                />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+                <Area type="monotone" dataKey="statusCode" stroke="#f59e0b" fill="#f59e0b20" strokeWidth={2} />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      className="border-none bg-background p-2 shadow-md"
+                      label="Status Code"
+                      formatter={(value) => [`${value}`, "Status Code"]}
                     />
                   }
                 />

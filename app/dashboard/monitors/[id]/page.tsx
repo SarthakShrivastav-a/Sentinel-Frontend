@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { useToast } from "@/components/ui/use-toast"
-import { AlertTriangle, ArrowLeft, Clock, Globe, Server, Trash } from "lucide-react"
+import { ArrowLeft, Trash } from "lucide-react"
 import type { MonitorDetails } from "@/lib/types"
 import { fetchMonitorDetails, deleteMonitor } from "@/lib/api"
 import { MonitorStatusBadge } from "@/components/dashboard/monitor-status-badge"
@@ -15,6 +15,7 @@ import { MonitorCheckHistoryTable } from "@/components/dashboard/monitor-check-h
 import { MonitorEditErrorConditionDialog } from "@/components/dashboard/monitor-edit-error-condition-dialog"
 import { MonitorDetailCharts } from "@/components/dashboard/monitor-detail-charts"
 import { formatDate } from "@/lib/utils"
+import { MonitorStatsSummary } from "@/components/dashboard/monitor-stats-summary"
 
 export default function MonitorDetailsPage({ params }: { params: { id: string } }) {
   const [monitorDetails, setMonitorDetails] = useState<MonitorDetails | null>(null)
@@ -134,90 +135,16 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Status</CardTitle>
-            <div className="h-4 w-4 rounded-full bg-muted p-1">
-              <Server className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {latestCheck ? <MonitorStatusBadge status={latestCheck.status} showText /> : "Unknown"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Last checked: {latestCheck ? formatDate(latestCheck.timestamp) : "Never"}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Response Time</CardTitle>
-            <div className="h-4 w-4 rounded-full bg-muted p-1">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestCheck ? `${latestCheck.responseTime}ms` : "N/A"}</div>
-            <p className="text-xs text-muted-foreground">
-              Threshold: {monitorDetails?.errorCondition?.threshold || "N/A"}ms
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Status Code</CardTitle>
-            <div className="h-4 w-4 rounded-full bg-muted p-1">
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestCheck ? latestCheck.statusCode : "N/A"}</div>
-            <p className="text-xs text-muted-foreground">Last HTTP status code</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Domain</CardTitle>
-            <div className="h-4 w-4 rounded-full bg-muted p-1">
-              <Globe className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{monitorDetails.sslInfo?.domainInfo?.name || "N/A"}</div>
-            <p className="text-xs text-muted-foreground">
-              IP: {monitorDetails.sslInfo?.domainInfo?.ipAddress || "Unknown"}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Uptime</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{monitorDetails.uptimePercentage || 0}%</div>
-            <p className="text-xs text-muted-foreground">
-              Total Checks: {monitorDetails.totalChecks || 0}
-              <br />
-              Up Checks: {monitorDetails.upChecks || 0}
-              <br />
-              Down Checks: {monitorDetails.downChecks || 0}
-              <br />
-              Current Status: {monitorDetails.currentStatus || "Unknown"}
-              <br />
-              Cumulative Downtime: {monitorDetails.cumulativeDowntime || 0}
-              <br />
-              Cumulative Response: {monitorDetails.cumulativeResponse || 0}
-              <br />
-              Consecutive Downtime Count: {monitorDetails.consecutiveDowntimeCount || 0}
-              <br />
-              Average Response Time: {monitorDetails.averageResponseTime || 0}ms
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <MonitorStatsSummary
+        totalChecks={monitorDetails.totalChecks || 0}
+        upChecks={monitorDetails.upChecks || 0}
+        downChecks={monitorDetails.downChecks || 0}
+        currentStatus={monitorDetails.currentStatus || "Unknown"}
+        cumulativeDowntime={monitorDetails.cumulativeDowntime || 0}
+        cumulativeResponse={monitorDetails.cumulativeResponse || 0}
+        consecutiveDowntimeCount={monitorDetails.consecutiveDowntimeCount || 0}
+        averageResponseTime={monitorDetails.averageResponseTime || 0}
+      />
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
@@ -285,4 +212,3 @@ export default function MonitorDetailsPage({ params }: { params: { id: string } 
     </div>
   )
 }
-  
