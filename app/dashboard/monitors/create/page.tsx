@@ -12,17 +12,43 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DashboardHeader } from "@/components/dashboard/header"
 import { useToast } from "@/components/ui/use-toast"
 import { createMonitor } from "@/lib/api"
+import { X } from "lucide-react"
 
 export default function CreateMonitorPage() {
   const [url, setUrl] = useState("")
-  const [triggerOn, setTriggerOn] = useState<string>("RESPONSE_TIME")
-  const [threshold, setThreshold] = useState<number>(500)
+  const [triggerOn, setTriggerOn] = useState<string>("TIMEOUT")
+  const [valueInput, setValueInput] = useState<string>("")
+  const [values, setValues] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
+  const handleAddValue = () => {
+    const numValue = parseInt(valueInput, 10)
+    if (!isNaN(numValue) && valueInput.trim() !== "") {
+      setValues([...values, numValue])
+      setValueInput("")
+    }
+  }
+
+  const handleRemoveValue = (index: number) => {
+    const newValues = [...values]
+    newValues.splice(index, 1)
+    setValues(newValues)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (values.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please add at least one value.",
+        variant: "destructive",
+      })
+      return
+    }
+    
     setIsLoading(true)
 
     try {
@@ -30,7 +56,7 @@ export default function CreateMonitorPage() {
         url,
         errorCondition: {
           triggerOn,
-          threshold,
+          value: values,
         },
       })
 
@@ -81,35 +107,68 @@ export default function CreateMonitorPage() {
 
             <div className="space-y-2">
               <Label htmlFor="triggerOn">Trigger On</Label>
-              <Select value={triggerOn} onValueChange={(value) => setTriggerOn(value)}>
+              <Select value={triggerOn} onValueChange={(value) => {
+                setTriggerOn(value)
+                // Reset values when changing trigger type
+                setValues([])
+              }}>
                 <SelectTrigger id="triggerOn">
                   <SelectValue placeholder="Select a trigger condition" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="RESPONSE_TIME">Response Time</SelectItem>
-                  <SelectItem value="STATUS_CODE">Status Code</SelectItem>
-                  <SelectItem value="CONTENT">Content</SelectItem>
+                  <SelectItem value="STATUS_NOT">Status Not</SelectItem>
+                  <SelectItem value="RESPONSE_CONTAINS">Response Contains</SelectItem>
+                  <SelectItem value="TIMEOUT">Timeout</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                {triggerOn === "STATUS_NOT"
+                  ? "Alert when status code is not in the list of allowed codes"
+                  : triggerOn === "RESPONSE_CONTAINS"
+                    ? "Alert when status code matches any in the list"
+                    : "Alert when request times out or exceeds the specified duration (in seconds)"}
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="threshold">Threshold</Label>
-              <Input
-                id="threshold"
-                type="number"
-                value={threshold}
-                onChange={(e) => setThreshold(Number.parseInt(e.target.value))}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                {triggerOn === "RESPONSE_TIME"
-                  ? "Alert when response time exceeds this value (in milliseconds)"
-                  : triggerOn === "STATUS_CODE"
-                    ? "Alert when status code is greater than or equal to this value"
-                    : "Alert when content does not contain expected string"}
-              </p>
+              <Label htmlFor="value">
+                {triggerOn === "TIMEOUT" ? "Timeout Duration (seconds)" : "Status Codes"}
+              </Label>
+              <div className="flex space-x-2">
+                <Input
+                  id="value"
+                  type="number"
+                  value={valueInput}
+                  onChange={(e) => setValueInput(e.target.value)}
+                  placeholder={triggerOn === "TIMEOUT" ? "e.g. 5" : "e.g. 200, 404"}
+                />
+                <Button type="button" onClick={handleAddValue}>
+                  Add
+                </Button>
+              </div>
             </div>
+
+            {values.length > 0 && (
+              <div className="border rounded-md p-3">
+                <Label>Current Values:</Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {values.map((value, index) => (
+                    <div key={index} className="flex items-center bg-slate-100 rounded-md px-3 py-1">
+                      <span>{value}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 ml-2"
+                        onClick={() => handleRemoveValue(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button type="button" variant="outline" onClick={() => router.push("/dashboard/monitors")}>
