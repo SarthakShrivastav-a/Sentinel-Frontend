@@ -62,7 +62,7 @@ export function DashboardSidebar() {
       <div className="flex h-14 items-center border-b px-3">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Zap className="h-6 w-6 text-primary" />
-          {!collapsed && <span className="text-xl font-bold">StreamLine</span>}
+          {!collapsed && <span className="text-xl font-bold">Sentinel</span>}
         </Link>
         <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setCollapsed(!collapsed)}>
           {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}

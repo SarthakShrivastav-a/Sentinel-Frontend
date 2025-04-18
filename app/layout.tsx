@@ -12,8 +12,8 @@ import { Analytics } from "@/components/analytics"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "StreamLine - Website Monitoring Made Simple",
-  description: "Monitor your website uptime, performance, and more with StreamLine",
+  title: "Sentinel - Website Monitoring Made Simple",
+  description: "Monitor your website uptime, performance, and more with Sentinel",
     generator: 'v0.dev'
 }
 

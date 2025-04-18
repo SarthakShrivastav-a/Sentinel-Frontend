@@ -54,7 +54,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-mesh p-4">
       <Link href="/" className="absolute left-8 top-8 flex items-center gap-2">
         <Zap className="h-6 w-6 text-primary animate-pulse-subtle" />
-        <span className="text-xl font-bold gradient-text">StreamLine</span>
+        <span className="text-xl font-bold gradient-text">Sentinel</span>
       </Link>
 
       <div className="grid w-full max-w-4xl grid-cols-1 md:grid-cols-2 gap-6">

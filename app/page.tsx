@@ -16,7 +16,7 @@ export default function Home() {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="h-6 w-6 text-primary animate-pulse-subtle" />
-            <span className="text-xl font-bold gradient-text">StreamLine</span>
+            <span className="text-xl font-bold gradient-text">Sentinel</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
@@ -142,13 +142,13 @@ export default function Home() {
                   Trusted by Businesses Worldwide
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  See what our customers have to say about StreamLine's monitoring services.
+                  See what our customers have to say about Sentinel's monitoring services.
                 </p>
               </div>
             </motion.div>
             <div className="mx-auto grid max-w-5xl gap-6 py-12 lg:grid-cols-2 lg:gap-12">
               <TestimonialCard
-                quote="StreamLine has been a game-changer for our business. We used to find out about website issues from our customers, but now we're the first to know and can fix problems before they impact our users."
+                quote="Sentinel has been a game-changer for our business. We used to find out about website issues from our customers, but now we're the first to know and can fix problems before they impact our users."
                 name="Sarah Johnson"
                 role="CTO, TechCorp"
                 delay={0.1}
@@ -232,7 +232,7 @@ export default function Home() {
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl gradient-text">Ready to Get Started?</h2>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Join thousands of businesses that trust StreamLine for their website monitoring needs.
+                  Join thousands of businesses that trust Sentinel for their website monitoring needs.
                 </p>
               </div>
               <motion.div
@@ -260,7 +260,7 @@ export default function Home() {
         <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
           <div className="flex items-center gap-2">
             <Zap className="h-6 w-6 text-primary animate-pulse-subtle" />
-            <span className="text-lg font-bold gradient-text">StreamLine</span>
+            <span className="text-lg font-bold gradient-text">Sentinel</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -273,7 +273,7 @@ export default function Home() {
               Contact
             </Link>
           </div>
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} StreamLine. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Sentinel. All rights reserved.</p>
         </div>
       </footer>
     </div>
