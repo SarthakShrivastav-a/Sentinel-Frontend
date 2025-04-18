@@ -26,3 +26,36 @@ export function formatDate(date: Date | string | null | undefined): string {
     return "Invalid date";
   }
 }
+export function formatDateTime(dateString: string): string {
+  if (!dateString) return "N/A"
+
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return "Invalid date"
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date)
+}
+
+// Format seconds to a human-readable duration
+export function formatDuration(seconds: number): string {
+  if (!seconds) return "N/A"
+
+  if (seconds < 60) {
+    return `${seconds} second${seconds !== 1 ? "s" : ""}`
+  } else if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60)
+    return `${minutes} minute${minutes !== 1 ? "s" : ""}`
+  } else if (seconds < 86400) {
+    const hours = Math.floor(seconds / 3600)
+    return `${hours} hour${hours !== 1 ? "s" : ""}`
+  } else {
+    const days = Math.floor(seconds / 86400)
+    return `${days} day${days !== 1 ? "s" : ""}`
+  }
+}
