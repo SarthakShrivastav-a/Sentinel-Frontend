@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   title: "Sentinel - Website Monitoring Made Simple",
   description: "Monitor your website uptime, performance, and more with Sentinel",
   generator: "v0.dev",
+  icons: {
+    icon: "/placeholder-logo.svg",
+  },
 }
 
 export default function RootLayout({
