@@ -118,3 +118,26 @@ export interface MaintenanceWindow {
   affectedResourceIds: string[]
   createdAt: string
 }
+
+export interface IncidentSummary {
+  summary: string
+  likely_cause: string
+  recommended_actions: string[]
+  fallback: boolean
+}
+
+export interface RootCauseHints {
+  hints: string[]
+  confidence: string
+  fallback: boolean
+}
+
+export interface PostmortemDraft {
+  executive_summary: string
+  impact: string
+  timeline: string[]
+  root_cause_hypothesis: string
+  resolution: string
+  prevention_tasks: string[]
+  fallback: boolean
+}

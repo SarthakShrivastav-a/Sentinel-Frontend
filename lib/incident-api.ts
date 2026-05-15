@@ -1,5 +1,5 @@
 import { apiRequest } from "./api"
-import type { Incident, MaintenanceWindow } from "./types"
+import type { Incident, IncidentSummary, MaintenanceWindow, PostmortemDraft, RootCauseHints } from "./types"
 
 export function fetchIncidents(): Promise<Incident[]> {
   return apiRequest("/api/incidents")
@@ -21,8 +21,16 @@ export function updateIncidentState(id: string, state: string, message: string):
   })
 }
 
-export function summarizeIncident(id: string): Promise<any> {
+export function summarizeIncident(id: string): Promise<IncidentSummary> {
   return apiRequest(`/api/copilot/incidents/${id}/summary`, { method: "POST" })
+}
+
+export function fetchRootCauseHints(id: string): Promise<RootCauseHints> {
+  return apiRequest(`/api/copilot/incidents/${id}/root-cause-hints`, { method: "POST" })
+}
+
+export function draftPostmortem(id: string): Promise<PostmortemDraft> {
+  return apiRequest(`/api/copilot/incidents/${id}/postmortem-draft`, { method: "POST" })
 }
 
 export function fetchMaintenanceWindows(): Promise<MaintenanceWindow[]> {
