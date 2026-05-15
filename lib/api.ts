@@ -1,7 +1,7 @@
   import type { Monitor, MonitorDetails } from "./types"
 
   // Base URL for all API requests
-  const API_BASE_URL = "http://localhost:8080"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
 
   // Helper function to handle API requests
   export async function apiRequest(endpoint: string, options: RequestInit = {}) {

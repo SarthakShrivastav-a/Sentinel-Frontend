@@ -69,3 +69,52 @@ export interface Team {
   userId: string
   teamMembers: TeamMember[]
 }
+
+export interface StatusComponent {
+  name: string
+  type: string
+  linkedResourceId: string
+  state: string
+}
+
+export interface StatusPage {
+  id: string
+  userId: string
+  name: string
+  slug: string
+  description: string
+  published: boolean
+  components: StatusComponent[]
+  createdAt: string
+}
+
+export interface IncidentUpdate {
+  state: string
+  message: string
+  createdAt: string
+}
+
+export interface Incident {
+  id: string
+  userId: string
+  title: string
+  severity: string
+  state: string
+  affectedComponentIds: string[]
+  assignedToEmail?: string
+  acknowledgedAt?: string
+  resolvedAt?: string
+  updates: IncidentUpdate[]
+  createdAt: string
+}
+
+export interface MaintenanceWindow {
+  id: string
+  userId: string
+  title: string
+  description: string
+  startsAt: string
+  endsAt: string
+  affectedResourceIds: string[]
+  createdAt: string
+}

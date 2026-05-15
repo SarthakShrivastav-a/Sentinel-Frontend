@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Activity, Bell, ChevronsLeft, ChevronsRight, LogOut, PlusCircle, Settings, Users, Zap } from "lucide-react"
+import { Activity, Bell, CalendarClock, ChevronsLeft, ChevronsRight, Globe2, LogOut, PlusCircle, Settings, Siren, Users, Zap } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "@/lib/auth-provider"
 import { cn } from "@/lib/utils"
@@ -44,6 +44,21 @@ export function DashboardSidebar() {
       title: "Heartbeats",
       href: "/dashboard/heartbeats",
       icon: Activity,
+    },
+    {
+      title: "Status Pages",
+      href: "/dashboard/status-pages",
+      icon: Globe2,
+    },
+    {
+      title: "Incidents",
+      href: "/dashboard/incidents",
+      icon: Siren,
+    },
+    {
+      title: "Maintenance",
+      href: "/dashboard/maintenance",
+      icon: CalendarClock,
     },
     {
       title: "Settings",

@@ -1,11 +1,11 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { Suspense } from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/lib/auth-provider"
-import { PageTransition } from "@/components/page-transition"
 import { CursorGlow } from "@/components/cursor-glow"
 import { Analytics } from "@/components/analytics"
 
@@ -14,7 +14,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Sentinel - Website Monitoring Made Simple",
   description: "Monitor your website uptime, performance, and more with Sentinel",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -28,16 +28,14 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <AuthProvider>
             {children}
-            {/* <PageTransition>{children}</PageTransition> */}
             <Toaster />
             <CursorGlow />
-            <Analytics />
+            <Suspense fallback={null}>
+              <Analytics />
+            </Suspense>
           </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-
-
-import './globals.css'
